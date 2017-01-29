@@ -2,12 +2,12 @@
 
  MSE 2202 MSEBot base code for Labs 3 and 4
  Language: Arduino
- Authors: Michael Naish and Eugen Porter
- Date: 16/01/17
- 
+ Base Code: Michael Naish and Eugen Porter
+ Completed By: Zach Mullins and Michael Bruhjell
+ Base Code Date: 16/01/17
+ Latest Revision: 29/01/17
  Rev 1 - Initial version
  Rev 2 - Update for MSEduino v. 2
- 
  */
 
 #include <Servo.h>
