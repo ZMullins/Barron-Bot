@@ -27,7 +27,7 @@ I2CEncoder encoder_LeftMotor;
 
 // Uncomment keywords to enable debugging output
 
-//#define DEBUG_MODE_DISPLAY
+#define DEBUG_MODE_DISPLAY
 //#define DEBUG_MOTORS
 //#define DEBUG_LINE_TRACKERS
 //#define DEBUG_ENCODERS
@@ -288,11 +288,55 @@ void loop()
         ui_Right_Motor_Speed = constrain(ui_Motors_Speed + ui_Right_Motor_Offset, 1600, 2100);
 
        /***************************************************************************************
-         Add line tracking code here. 
-         Adjust motor speed according to information from line tracking sensors and 
-         possibly encoder counts.
+         if(ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
+  {
+    CharliePlexM::Write(ci_Left_Line_Tracker_LED, HIGH);
+  }
+  else
+  { 
+    CharliePlexM::Write(ci_Left_Line_Tracker_LED, LOW);
+  }
+  if(ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
+  {
+    CharliePlexM::Write(ci_Middle_Line_Tracker_LED, HIGH);
+  }
+  else
+  { 
+    CharliePlexM::Write(ci_Middle_Line_Tracker_LED, LOW);
+  }
+  if(ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
+  {
+    CharliePlexM::Write(ci_Right_Line_Tracker_LED, HIGH);
+  }
+  else
+  { 
+    CharliePlexM::Write(ci_Right_Line_Tracker_LED, LOW);
+  }
        /*************************************************************************************/
+        if(ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) {
+          if(ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) {
+            ui_Right_Motor_Speed = 1600;
+          }
+          if(ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
+         {
+             ui_Left_Motor_Speed = 1600;
 
+        }
+        }
+        else {
+          if(ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) {
+            ui_Right_Motor_Speed = 1500;
+          }
+          if(ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
+         { 
+          ui_Left_Motor_Speed = 1500;
+          }
+         
+          else {
+            ui_Right_Motor_Speed = 1500;
+            ui_Left_Motor_Speed = 1500;
+          }
+        }
         if(bt_Motors_Enabled)
         {
           servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
