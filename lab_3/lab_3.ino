@@ -27,7 +27,7 @@ I2CEncoder encoder_LeftMotor;
 
 // Uncomment keywords to enable debugging output
 
-#define DEBUG_MODE_DISPLAY
+//#define DEBUG_MODE_DISPLAY
 //#define DEBUG_MOTORS
 //#define DEBUG_LINE_TRACKERS
 //#define DEBUG_ENCODERS
@@ -313,30 +313,33 @@ void loop()
     CharliePlexM::Write(ci_Right_Line_Tracker_LED, LOW);
   }
        /*************************************************************************************/
-        if(ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) {
-          if(ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) {
-            ui_Right_Motor_Speed = 1600;
-          }
-          if(ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
-         {
-             ui_Left_Motor_Speed = 1600;
-
+        if(ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) 
+        {
+            bt_Motors_Enabled = true; 
+            ui_Left_Motor_Speed = 2100;
+            ui_Right_Motor_Speed = 2100;
         }
+        else 
+        {
+          bt_Motors_Enabled = true; 
+          if(ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) 
+          {
+            ui_Left_Motor_Speed = 1750;
+            ui_Right_Motor_Speed = 1450;
+          }
+          else if(ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
+          { 
+            ui_Right_Motor_Speed = 2100;
+            ui_Left_Motor_Speed = 1450;
+            
+          }
+          else 
+          { 
+              bt_Motors_Enabled = false; 
+          }
         }
-        else {
-          if(ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) {
-            ui_Right_Motor_Speed = 1500;
-          }
-          if(ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
-         { 
-          ui_Left_Motor_Speed = 1500;
-          }
-         
-          else {
-            ui_Right_Motor_Speed = 1500;
-            ui_Left_Motor_Speed = 1500;
-          }
-        }
+        
+        
         if(bt_Motors_Enabled)
         {
           servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
