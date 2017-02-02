@@ -608,6 +608,30 @@ void Ping()
   Serial.println(ul_Echo_Time/58); //divide time by 58 to get distance in cm 
 #endif
 }  
+void Reverse() {
+while(ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) {
+  ui_Left_Motor_Speed = 800;
+  ui_Right_Motor_Speed = 800;
+  servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Speed); 
+      servo_RightMotor.writeMicroseconds(ci_Right_Motor_Speed); 
+      readLineTrackers();
+      }
+}
+TurnRightOn() {
+  ui_Right_Motor_Speed = 2100;
+  ui_Left_Motor_Speed = 200;
+   servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Speed); 
+      servo_RightMotor.writeMicroseconds(ci_Right_Motor_Speed); 
+  delay(300);
+  while(ui_Left_Line_Tracker_Data > (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) {
+  ui_Left_Motor_Speed = 210;
+  ui_Right_Motor_Speed = 200;
+  servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Speed); 
+      servo_RightMotor.writeMicroseconds(ci_Right_Motor_Speed); 
+      readLineTrackers();
+      }
+}
+
 
 
 
