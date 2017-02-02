@@ -30,7 +30,7 @@ I2CEncoder encoder_LeftMotor;
 //#define DEBUG_MODE_DISPLAY
 //#define DEBUG_MOTORS
 //#define DEBUG_LINE_TRACKERS
-//#define DEBUG_ENCODERS
+#define DEBUG_ENCODERS
 //#define DEBUG_ULTRASONIC
 //#define DEBUG_LINE_TRACKER_CALIBRATION
 //#define DEBUG_MOTOR_CALIBRATION
@@ -148,6 +148,9 @@ boolean bt_Heartbeat = true;
 boolean bt_3_S_Time_Up = false;
 boolean bt_Do_Once = false;
 boolean bt_Cal_Initialized = false;
+
+// our own variables 
+int count = 0; 
 
 void setup() {
   Wire.begin();        // Wire library required for I2CEncoder library
@@ -283,36 +286,16 @@ void loop()
         Serial.println(l_Right_Motor_Position);
 #endif
 
+// if (count = 0){ // reverse }
+// if (count = 1){ // turn past 180 degrees }
+
+
+if (count == 2) // normal line following -- stop and increase count at black 
+{
        // set motor speeds
         ui_Left_Motor_Speed = constrain(ui_Motors_Speed + ui_Left_Motor_Offset, 1600, 2100);
         ui_Right_Motor_Speed = constrain(ui_Motors_Speed + ui_Right_Motor_Offset, 1600, 2100);
 
-       /***************************************************************************************
-         if(ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
-  {
-    CharliePlexM::Write(ci_Left_Line_Tracker_LED, HIGH);
-  }
-  else
-  { 
-    CharliePlexM::Write(ci_Left_Line_Tracker_LED, LOW);
-  }
-  if(ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
-  {
-    CharliePlexM::Write(ci_Middle_Line_Tracker_LED, HIGH);
-  }
-  else
-  { 
-    CharliePlexM::Write(ci_Middle_Line_Tracker_LED, LOW);
-  }
-  if(ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
-  {
-    CharliePlexM::Write(ci_Right_Line_Tracker_LED, HIGH);
-  }
-  else
-  { 
-    CharliePlexM::Write(ci_Right_Line_Tracker_LED, LOW);
-  }
-       /*************************************************************************************/
         if(ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) 
         {
             bt_Motors_Enabled = true; 
@@ -335,11 +318,10 @@ void loop()
           }
           else 
           { 
+              count = 3;  
               bt_Motors_Enabled = false; 
           }
         }
-        
-        
         if(bt_Motors_Enabled)
         {
           servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
@@ -361,6 +343,19 @@ void loop()
         Serial.println(ui_Right_Motor_Speed);
 #endif    
         ui_Mode_Indicator_Index = 1;
+}
+
+// if (count = 3){ // turn 90 degrees right, hit line, turn 90 degrees left  }
+// if (count = 4){ // follow line, stop and do a 180 when all 3 are on, follow line until black  }
+// if (count = 5){ // turn 90 degrees right, hit line, turn 90 degrees left }
+// if (count = 6){ // normal line tracking, stop at black }
+// if (count = 7){ // drive forward, stop based on ultrasonic, use light sensor, extend claw and grab light, bring claw back }
+// if (count = 8){ // turn 90 degrees left, drive straight until all 3 are on }
+
+
+
+
+        
       }
       break;
     } 
@@ -608,28 +603,32 @@ void Ping()
   Serial.println(ul_Echo_Time/58); //divide time by 58 to get distance in cm 
 #endif
 }  
-void Reverse() {
+void Reverse() 
+{
+   unsigned int ci_Left_Motor_Speed = 800;
+   unsigned int ci_Right_Motor_Speed = 800; 
 while(ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) {
-  ui_Left_Motor_Speed = 800;
-  ui_Right_Motor_Speed = 800;
+  ci_Left_Motor_Speed = 800;
+  ci_Right_Motor_Speed = 800;
   servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Speed); 
       servo_RightMotor.writeMicroseconds(ci_Right_Motor_Speed); 
       readLineTrackers();
       }
 }
-TurnRightOn() {
-  ui_Right_Motor_Speed = 2100;
-  ui_Left_Motor_Speed = 200;
-   servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Speed); 
-      servo_RightMotor.writeMicroseconds(ci_Right_Motor_Speed); 
-  delay(300);
-  while(ui_Left_Line_Tracker_Data > (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) {
-  ui_Left_Motor_Speed = 210;
-  ui_Right_Motor_Speed = 200;
+void TurnRightOn() {
+  unsigned int ci_Right_Motor_Speed = 2100;
+  unsigned int ci_Left_Motor_Speed = 200;
   servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Speed); 
-      servo_RightMotor.writeMicroseconds(ci_Right_Motor_Speed); 
-      readLineTrackers();
-      }
+  servo_RightMotor.writeMicroseconds(ci_Right_Motor_Speed); 
+  delay(300);
+  while(ui_Left_Line_Tracker_Data > (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) 
+  {
+    ui_Left_Motor_Speed = 210;
+    ui_Right_Motor_Speed = 200;
+    servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Speed); 
+    servo_RightMotor.writeMicroseconds(ci_Right_Motor_Speed); 
+    readLineTrackers();
+  }
 }
 
 
