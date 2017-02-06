@@ -380,8 +380,7 @@ if (count == 2) // normal line following -- stop and increase count at black
           else 
           { 
               count = 3;  
-              bt_Motors_Enabled = false; 
-              
+              bt_Motors_Enabled = false;     
           }
         }
         if(bt_Motors_Enabled)
@@ -424,28 +423,185 @@ if (count == 3)
   }
   else if(!countNinety)
   {
-    ui_Left_Motor_Speed = 1400;
-    ui_Right_Motor_Speed = 1500;
-    servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
-    servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
-    delay (500); 
-    if (ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
+    if (secondNinety == 0)
     {
-      count = 4;   
-      ui_Left_Motor_Speed = 1500;
+      ui_Left_Motor_Speed = 1400;
+      ui_Right_Motor_Speed = 1500;
+      servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
+      servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
+      delay (1000); 
+      secondNinety++; 
+    }
+    if(secondNinety != 0)
+    {
+      ui_Left_Motor_Speed = 1400;
       ui_Right_Motor_Speed = 1500;
       servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
       servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
     }
+    if (ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
+    {
+      ui_Left_Motor_Speed = 1500;
+      ui_Right_Motor_Speed = 1500;
+      servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
+      servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
+      count = 4;   
+    }
+  }
+  
+}
+
+
+if (count == 4)
+{ 
+// follow line, stop when black  
+
+  if(ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) 
+  {
+    bt_Motors_Enabled = true; 
+    ui_Left_Motor_Speed = 1600;
+    ui_Right_Motor_Speed = 1600;
+   }
+  else 
+  {
+    bt_Motors_Enabled = true; 
+    if(ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) 
+    {
+        ui_Left_Motor_Speed = 1670;
+        ui_Right_Motor_Speed = 1550;
+    }
+    else if(ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
+    { 
+         ui_Right_Motor_Speed = 1670;
+         ui_Left_Motor_Speed = 1550;   
+    }
+  }
+  if(bt_Motors_Enabled)
+  {
+    servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
+    servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
+  }
+  
+  // stops if all 3 on 
+  if ( (ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)))
+  {
+    ui_Left_Motor_Speed = 1500;
+    ui_Right_Motor_Speed = 1500; 
+    servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed); 
+    servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed); 
+    count = 5; 
+    delay (1000);
+  }
+}
+
+if (count == 5)
+{
+  // reverse to end of line
+  if ( (ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)))
+    {
+      ui_Left_Motor_Speed = 1400;
+      ui_Right_Motor_Speed = 1400; 
+      servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed); 
+      servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed); 
+      delay(300); 
+    }
+    while(ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) 
+    {
+      ui_Left_Motor_Speed = 1400;
+      ui_Right_Motor_Speed = 1390;
+      servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed); 
+      servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed); 
+      readLineTrackers();
+     }
+
+    if ( (ui_Middle_Line_Tracker_Data >= (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Right_Line_Tracker_Data >= (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Left_Line_Tracker_Data >= (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)))
+    {
+      ui_Left_Motor_Speed = 1500;
+      ui_Right_Motor_Speed = 1500;
+      servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
+      servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
+      delay(1000); 
+      count = 6;  
+      startFirstTurn = true;  
+    } 
+  
+} 
+
+
+
+if (count == 6)
+{  
+//  get back onto line
+
+    ui_Left_Motor_Speed = 1400;
+    ui_Right_Motor_Speed = 1600;
+    servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
+    servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
+
+    // delay to just get off the line
+    if (startFirstTurn)
+    {
+      delay (200); 
+      startFirstTurn = false;   
+    }
+    
+    if (  (ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) || (ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)))
+    {
+      ui_Left_Motor_Speed = 1500;
+      ui_Right_Motor_Speed = 1500;
+      servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
+      servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
+      delay(1000); 
+      count = 7;   
+    }
+  
+  
+}
+
+if (count == 7)
+{ // normal line tracking, stop at black 
+
+   if(ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) 
+  {
+    bt_Motors_Enabled = true; 
+    ui_Left_Motor_Speed = 1600;
+    ui_Right_Motor_Speed = 1600;
+   }
+  else 
+  {
+    bt_Motors_Enabled = true; 
+    if(ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) 
+    {
+        ui_Left_Motor_Speed = 1670;
+        ui_Right_Motor_Speed = 1550;
+    }
+    else if(ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
+    { 
+         ui_Right_Motor_Speed = 1670;
+         ui_Left_Motor_Speed = 1550;   
+    }
+    else 
+    { 
+        count = 8;  
+        bt_Motors_Enabled = false;     
+    }
+  }
+  if(bt_Motors_Enabled)
+  {
+    servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
+    servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
+  }
+  else
+  {  
+    servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Stop); 
+    servo_RightMotor.writeMicroseconds(ci_Right_Motor_Stop);
+    delay (1000);  
   }
   
   
 }
-// if (count == 4){ // follow line, stop and do a 180 when all 3 are on, follow line until black  }
-// if (count == 5){ // turn 90 degrees right, hit line, turn 90 degrees left }
-// if (count == 6){ // normal line tracking, stop at black }
-// if (count == 7){ // drive forward, stop based on ultrasonic, use light sensor, extend claw and grab light, bring claw back }
-// if (count == 8){ // turn 90 degrees left, drive straight until all 3 are on 
+// if (count == 8){ // drive forward, stop based on ultrasonic, use light sensor, extend claw and grab light, bring claw back }
+// if (count == 9){ // turn 90 degrees left, drive straight until all 3 are on 
 
         
       }
