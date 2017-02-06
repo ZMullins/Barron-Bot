@@ -151,6 +151,7 @@ boolean bt_Cal_Initialized = false;
 
 // our own variables 
 int count = 0; 
+bool startFirstTurn = true; 
 
 void setup() {
   Wire.begin();        // Wire library required for I2CEncoder library
@@ -286,8 +287,33 @@ void loop()
         Serial.println(l_Right_Motor_Position);
 #endif
 
-// if (count = 0){ // reverse }
-// if (count = 1){ // turn past 180 degrees }
+// if (count == 0){ // reverse }
+
+if (count == 1)
+{  // turn past 180 degrees 
+//  freeze left wheel and turn right one backwards until it sees the line then move onto normal line following 
+
+    ui_Left_Motor_Speed = 1500;
+    ui_Right_Motor_Speed = 1400;
+    servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
+    servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
+
+    // delay to just get off the line
+    if (startFirstTurn)
+    {
+      delay (300); 
+      startFirstTurn = false;   
+    }
+    
+    if (  (ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) || (ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)))
+    {
+      ui_Left_Motor_Speed = 1500;
+      ui_Right_Motor_Speed = 1500;
+      servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
+      servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
+      count = 2;   
+    }
+}
 
 
 if (count == 2) // normal line following -- stop and increase count at black 
@@ -344,13 +370,17 @@ if (count == 2) // normal line following -- stop and increase count at black
 #endif    
         ui_Mode_Indicator_Index = 1;
 }
-
-// if (count = 3){ // turn 90 degrees right, hit line, turn 90 degrees left  }
-// if (count = 4){ // follow line, stop and do a 180 when all 3 are on, follow line until black  }
-// if (count = 5){ // turn 90 degrees right, hit line, turn 90 degrees left }
-// if (count = 6){ // normal line tracking, stop at black }
-// if (count = 7){ // drive forward, stop based on ultrasonic, use light sensor, extend claw and grab light, bring claw back }
-// if (count = 8){ // turn 90 degrees left, drive straight until all 3 are on }
+if (count == 3)
+{ // turn 90 degrees right, hit line, turn 90 degrees left  
+  
+  
+  
+}
+// if (count == 4){ // follow line, stop and do a 180 when all 3 are on, follow line until black  }
+// if (count == 5){ // turn 90 degrees right, hit line, turn 90 degrees left }
+// if (count == 6){ // normal line tracking, stop at black }
+// if (count == 7){ // drive forward, stop based on ultrasonic, use light sensor, extend claw and grab light, bring claw back }
+// if (count == 8){ // turn 90 degrees left, drive straight until all 3 are on }
 
 
 
