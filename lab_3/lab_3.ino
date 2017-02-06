@@ -86,10 +86,10 @@ const int ci_Right_Motor_Offset_Address_H = 15;
 
 const int ci_Left_Motor_Stop = 1500;        // 200 for brake mode; 1500 for stop
 const int ci_Right_Motor_Stop = 1500;
-const int ci_Grip_Motor_Open = 140;         // Experiment to determine appropriate value
-const int ci_Grip_Motor_Closed = 90;        //  "
-const int ci_Arm_Servo_Retracted = 55;      //  "
-const int ci_Arm_Servo_Extended = 120;      //  "
+const int ci_Grip_Motor_Open = 1970;         // Experiment to determine appropriate value
+const int ci_Grip_Motor_Closed = 830;        //  "
+const int ci_Arm_Servo_Retracted = 1300;      //  "
+const int ci_Arm_Servo_Extended = 1750;      //  "
 const int ci_Display_Time = 500;
 const int ci_Line_Tracker_Calibration_Interval = 100;
 const int ci_Line_Tracker_Cal_Measures = 20;
@@ -292,7 +292,8 @@ void loop()
 
 if (count == 0)
 { // reverse 
-
+servo_GripMotor.detach();
+servo_ArmMotor.detach();
     if ( (ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)))
     {
       ui_Left_Motor_Speed = 1400;
@@ -600,13 +601,57 @@ if (count == 7)
   
   
 }
-// if (count == 8){ // drive forward, stop based on ultrasonic, use light sensor, extend claw and grab light, bring claw back }
-// if (count == 9){ // turn 90 degrees left, drive straight until all 3 are on 
+ if (count == 8){ 
+servo_LeftMotor.writeMicroseconds(1700); 
+    servo_RightMotor.writeMicroseconds(1700);
+    delay (1000);
+        servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Stop); 
+    servo_RightMotor.writeMicroseconds(ci_Right_Motor_Stop); 
+  servo_ArmMotor.attach(ci_Arm_Motor);
+  servo_GripMotor.attach(ci_Grip_Motor);
+    servo_GripMotor.writeMicroseconds(ci_Grip_Motor_Open);
+  delay(1000);
+  servo_ArmMotor.writeMicroseconds(ci_Arm_Servo_Extended);
+  delay(1000);
+  servo_GripMotor.writeMicroseconds(ci_Grip_Motor_Closed);
+  delay(1000);
+  servo_ArmMotor.writeMicroseconds(ci_Arm_Servo_Retracted);
+  delay(1000);
+  count = 9;
+    }
+ if (count == 9){ 
+servo_LeftMotor.writeMicroseconds(1400); 
+    servo_RightMotor.writeMicroseconds(1400);
+    delay (1000);
+ 
+    while ((ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))!=true){
+         servo_LeftMotor.writeMicroseconds(1500); 
+    servo_RightMotor.writeMicroseconds(1600);
+    }
+    while ( ((ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)))!=true)
+  {
+    servo_LeftMotor.writeMicroseconds(1600); 
+    servo_RightMotor.writeMicroseconds(1600);
+  }
+    servo_LeftMotor.writeMicroseconds(1500); 
+    servo_RightMotor.writeMicroseconds(1500);
+    delay(1000);
+      servo_ArmMotor.writeMicroseconds(ci_Arm_Servo_Extended);
+        delay(1000);
+     servo_GripMotor.writeMicroseconds(ci_Grip_Motor_Open);
+  servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Stop); 
+    servo_RightMotor.writeMicroseconds(ci_Right_Motor_Stop);
 
-        
+  }
+
       }
+    
       break;
     } 
+
+
+
+
     
     case 2:    //Calibrate line tracker light levels after 3 seconds
     {
