@@ -330,6 +330,8 @@ if (count == 1)
 
     ui_Left_Motor_Speed = 1600;
     ui_Right_Motor_Speed = 1400;
+ 
+    
     servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
     servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
 
@@ -896,18 +898,7 @@ void Ping()
   Serial.println(ul_Echo_Time/58); //divide time by 58 to get distance in cm 
 #endif
 }  
-void Reverse() 
-{
-   unsigned int ci_Left_Motor_Speed = 800;
-   unsigned int ci_Right_Motor_Speed = 800; 
-while(ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) {
-  ci_Left_Motor_Speed = 800;
-  ci_Right_Motor_Speed = 800;
-  servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Speed); 
-      servo_RightMotor.writeMicroseconds(ci_Right_Motor_Speed); 
-      readLineTrackers();
-      }
-}
+
 void TurnRightOn() {
   unsigned int ci_Right_Motor_Speed = 2100;
   unsigned int ci_Left_Motor_Speed = 200;
