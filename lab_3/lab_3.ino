@@ -603,49 +603,95 @@ if (count == 7)
   
   
 }
- if (count == 8){ 
-servo_LeftMotor.writeMicroseconds(1700); 
+ if (count == 8)
+ { // grabbing the light
+    servo_LeftMotor.writeMicroseconds(1700); 
     servo_RightMotor.writeMicroseconds(1700);
     delay (1000);
-        servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Stop); 
+    servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Stop); 
     servo_RightMotor.writeMicroseconds(ci_Right_Motor_Stop); 
-  servo_ArmMotor.attach(ci_Arm_Motor);
-  servo_GripMotor.attach(ci_Grip_Motor);
+    servo_ArmMotor.attach(ci_Arm_Motor);
+    servo_GripMotor.attach(ci_Grip_Motor);
     servo_GripMotor.writeMicroseconds(ci_Grip_Motor_Open);
-  delay(1000);
-  servo_ArmMotor.writeMicroseconds(ci_Arm_Servo_Extended);
-  delay(1000);
-  servo_GripMotor.writeMicroseconds(ci_Grip_Motor_Closed);
-  delay(1000);
-  servo_ArmMotor.writeMicroseconds(ci_Arm_Servo_Retracted);
-  delay(1000);
-  count = 9;
-    }
- if (count == 9){ 
-servo_LeftMotor.writeMicroseconds(1400); 
-    servo_RightMotor.writeMicroseconds(1400);
-    delay (1000);
- 
-    while ((ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))!=true){
-         servo_LeftMotor.writeMicroseconds(1500); 
-    servo_RightMotor.writeMicroseconds(1600);
-    }
-    while ( ((ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)))!=true)
-  {
-    servo_LeftMotor.writeMicroseconds(1600); 
-    servo_RightMotor.writeMicroseconds(1600);
-  }
-    servo_LeftMotor.writeMicroseconds(1500); 
-    servo_RightMotor.writeMicroseconds(1500);
     delay(1000);
-      servo_ArmMotor.writeMicroseconds(ci_Arm_Servo_Extended);
-        delay(1000);
-     servo_GripMotor.writeMicroseconds(ci_Grip_Motor_Open);
-  servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Stop); 
-    servo_RightMotor.writeMicroseconds(ci_Right_Motor_Stop);
+    servo_ArmMotor.writeMicroseconds(ci_Arm_Servo_Extended);
+    delay(1000);
+    servo_GripMotor.writeMicroseconds(ci_Grip_Motor_Closed);
+    delay(1000);
+    servo_ArmMotor.writeMicroseconds(ci_Arm_Servo_Retracted);
+    delay(1000);
+    count = 9;
+  }
+ if (count == 9)
+ { // reverse and turn
+    servo_LeftMotor.writeMicroseconds(1400); 
+    servo_RightMotor.writeMicroseconds(1400);
+    delay (1500);
+    
+    ui_Left_Motor_Speed = 1500;
+    ui_Right_Motor_Speed = 1600;
+ 
+    
+    servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
+    servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
+    
+    if (  (ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) || (ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)))
+    {
+      ui_Left_Motor_Speed = 1500;
+      ui_Right_Motor_Speed = 1500;
+      servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
+      servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
+      count = 10; 
+      delay(500);   
+    }
 
   }
+  if (count == 10)
+  { // drive to block and release the light
 
+      
+        if(ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) 
+        {
+          bt_Motors_Enabled = true; 
+          ui_Left_Motor_Speed = 1600;
+          ui_Right_Motor_Speed = 1600;
+         }
+        else 
+        {
+          bt_Motors_Enabled = true; 
+          if(ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) 
+          {
+              ui_Left_Motor_Speed = 1670;
+              ui_Right_Motor_Speed = 1550;
+          }
+          else if(ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance))
+          { 
+               ui_Right_Motor_Speed = 1670;
+               ui_Left_Motor_Speed = 1550;   
+          }
+        }
+        if(bt_Motors_Enabled)
+        {
+          servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed);
+          servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed);
+        }
+        
+        // stops if all 3 on 
+        if ( (ui_Right_Line_Tracker_Data < (ui_Right_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Middle_Line_Tracker_Data < (ui_Middle_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)) && (ui_Left_Line_Tracker_Data < (ui_Left_Line_Tracker_Dark - ui_Line_Tracker_Tolerance)))
+        {
+          ui_Left_Motor_Speed = 1500;
+          ui_Right_Motor_Speed = 1500; 
+          servo_LeftMotor.writeMicroseconds(ui_Left_Motor_Speed); 
+          servo_RightMotor.writeMicroseconds(ui_Right_Motor_Speed); 
+          delay (1000);
+          servo_ArmMotor.writeMicroseconds(ci_Arm_Servo_Extended);
+          delay(1000);
+          servo_GripMotor.writeMicroseconds(ci_Grip_Motor_Open);
+          servo_LeftMotor.writeMicroseconds(ci_Left_Motor_Stop); 
+          servo_RightMotor.writeMicroseconds(ci_Right_Motor_Stop);   
+        }
+    
+  }
       }
     
       break;
